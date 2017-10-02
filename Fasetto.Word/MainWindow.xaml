@@ -5,11 +5,138 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fasetto.Word"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:WindowViewModel,IsDesignTimeCreatable=True}"
+        x:Name="AppWindow"
         Icon="pack://application:,,,/Fasetto.Word;component/Images/Logo/logo-small.png"
         WindowStyle="None"
         AllowsTransparency="True"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        WindowStartupLocation="CenterScreen"
+        Title="Welcome, Friend" 
+        MinWidth="{Binding WindowMinimumWidth}"
+        MinHeight="{Binding WindowMinimumHeight}"
+        Height="350" 
+        Width="525">
+    
+    <Window.Resources>
+        <Style TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <!-- Outer border with dropshadow margin -->
+                        <Border Padding="{Binding OuterMarginSizeThickness, FallbackValue=10}">
+                            
+                            <!-- Main window outline -->
+                            <Grid>
+
+                                <!-- Opacity mask for corners on grid -->
+                                <Border x:Name="Container"
+                                        Background="{StaticResource BackgroundLightBrush}"
+                                        CornerRadius="{Binding WindowCornerRadius}"/>
+                                
+                                <!-- Window border and dropshadow -->
+                                <Border CornerRadius="{Binding WindowCornerRadius}"
+                                        Background="{StaticResource ForegroundLightBrush}">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="0" Opacity="0.2"/>
+                                    </Border.Effect>
+                                </Border>
+
+                                <!-- The main window content -->
+                                <Grid>
+                                    
+                                    <!-- Corner clipping -->
+                                    <Grid.OpacityMask>
+                                        <VisualBrush Visual="{Binding ElementName=Container}"/>
+                                    </Grid.OpacityMask>
+                                    
+                                    <Grid.RowDefinitions>
+                                        <!-- Title Bar -->
+                                        <RowDefinition Height="{Binding TitleHeightGridLenght}"/>
+                                        <!-- Drop shadow -->
+                                        <RowDefinition Height="Auto"/>
+                                        <!-- Window content -->
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    
+                                    <!-- Title Bar -->
+                                    <Grid Grid.Column="0" Panel.ZIndex="1">
+                                        <Grid.ColumnDefinitions>
+                                            <!-- Icon -->
+                                            <ColumnDefinition Width="Auto"/>
+                                            <!-- Title -->
+                                            <ColumnDefinition Width="*"/>
+                                            <!-- Windows Buttons -->
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        
+                                        <!-- Icon -->
+                                        <Button Style="{StaticResource SystemIconButton}"
+                                                Command="{Binding MenuCommand}">
+                                            <Image Source="/Fasetto.Word;component/Images/Logo/logo-small.png"/>
+                                        </Button>
+                                        
+                                        <!-- Title -->
+                                        <Viewbox Grid.Column="1" Margin="0">
+                                            <TextBlock Style="{StaticResource HeaderText}" Text="{Binding RelativeSource={RelativeSource TemplatedParent},Path=Title}"/>
+                                        </Viewbox>
+                                        
+                                        <!-- Window Buttons -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                            <Button Style="{StaticResource WindowControlButton}" 
+                                                    Command="{Binding MinimizeCommand}"
+                                                    Content="_"/>
+                                            <Button Style="{StaticResource WindowControlButton}" 
+                                                    Command="{Binding MaximizeCommand}"
+                                                    Content="[ ]"/>
+                                            <Button Style="{StaticResource WindowCloseButton}" 
+                                                    Command="{Binding CloseCommand}"
+                                                    Content="X"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    
+                                    <!-- Drop shadow -->
+                                    <Border Grid.Row="1" Height="6" BorderThickness="0,0.2,0,0">
+                                        
+                                        <!-- Under line -->
+                                        <Border.BorderBrush>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                                <GradientStop Color="{StaticResource ForegroundLight}" Offset="0.0"/>
+                                                <GradientStop Color="{StaticResource ForegroundMain}" Offset="0.5"/>
+                                                <GradientStop Color="{StaticResource ForegroundLight}" Offset="1.0"/>
+                                            </LinearGradientBrush>
+                                        </Border.BorderBrush>
+                                        
+                                        <!-- Drop shadow -->
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Color="{StaticResource BackgroundVeryLight}" Offset="0.0"/>
+                                                <GradientStop Color="{StaticResource ForegroundLight}" Offset="1.0"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    
+                                    <!-- Page content -->
+                                    <Border Grid.Row="2" Padding="{Binding InnerContentPadding}">
+                                        <ContentPresenter Content="{TemplateBinding Content}"/>
+                                    </Border>
+
+                                </Grid>
+
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    
+    <WindowChrome.WindowChrome>
+        <WindowChrome ResizeBorderThickness="{Binding ResizeBorderThickness}"
+                      CaptionHeight="{Binding TitleHeight}"
+                      CornerRadius="0"
+                      GlassFrameThickness="0"/>
+    </WindowChrome.WindowChrome>
+    <Grid Background="{StaticResource ForegroundLightBrush}">
+
     </Grid>
 </Window>
