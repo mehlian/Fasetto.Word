@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fasetto.Word"
         mc:Ignorable="d"
+        Icon="pack://application:,,,/Fasetto.Word;component/Images/Logo/logo-small.png"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         
