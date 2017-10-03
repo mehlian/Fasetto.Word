@@ -17,42 +17,54 @@ namespace Fasetto.Word
         private int _outerMarginSize = 10;
         // Radius of the edges of the window
         private int _windowRadius = 10;
+        // The last known dock position
+        private WindowDockPosition _dockPosition = WindowDockPosition.Undocked;
 
         public double WindowMinimumWidth { get; set; } = 400;
         public double WindowMinimumHeight { get; set; } = 400;
+        // True if the window should be borderless because it is docked or maximized
+        public bool Borderless { get { return (_window.WindowState == WindowState.Maximized || _dockPosition != WindowDockPosition.Undocked); } }
         // The size of the border around the window in px
         public int ResizeBorder { get; set; } = 6;
         // Size of the resize border around the window, taking account the outer margin
         public Thickness ResizeBorderThickness { get { return new Thickness(ResizeBorder+OuterMarginSize); } }
+        // The padding of the inner content of the main window
+        public Thickness InnerContentPadding { get { return new Thickness(ResizeBorder); } }
+        // The margin around the window to allow for a drop shadow
         public int OuterMarginSize
         {
             get
             {
-                return _window.WindowState == WindowState.Maximized ? 0 : _outerMarginSize;
+                // If it is maximized or docked, no border
+                return Borderless ? 0 : _outerMarginSize;
             }
             set
             {
                 _outerMarginSize = value;
             }
         }
+        // The margin around the window to allow for a drop shadow
         public Thickness OuterMarginSizeThickness { get { return new Thickness(OuterMarginSize); } }
+        // The radius of the edges of the window
         public int WindowRadius
         {
             get
             {
-                return _window.WindowState == WindowState.Maximized ? 0 : _windowRadius;
+                // If it is maximized or docked, no border
+                return Borderless ? 0 : _windowRadius;
             }
             set
             {
                 _windowRadius = value;
             }
         }
+        // The radius of the edges of the window
         public CornerRadius WindowCornerRadius { get { return new CornerRadius(WindowRadius); } }
+        // The height of the title bar / caption of the window
         public int TitleHeight { get; set; } = 42;
+        // The height of the title bar / caption of the window
         public GridLength TitleHeightGridLenght { get { return new GridLength(TitleHeight+ResizeBorder); } }
-        public Thickness InnerContentPadding { get { return new Thickness(ResizeBorder); } }
-
-        
+                
         // Command to minimize window
         public ICommand MinimizeCommand { get; set; }
         // Command to maximize window
@@ -74,12 +86,7 @@ namespace Fasetto.Word
             // Listen out for window resizing
             _window.StateChanged += (sender, e) =>
              {
-                 //Fire off events for all properties that are affected by resize
-                 OnPropertyChanged(nameof(ResizeBorderThickness));
-                 OnPropertyChanged(nameof(OuterMarginSize));
-                 OnPropertyChanged(nameof(OuterMarginSizeThickness));
-                 OnPropertyChanged(nameof(WindowRadius));
-                 OnPropertyChanged(nameof(WindowCornerRadius));
+                 WindowResized();
              };
 
             // Create commands
@@ -90,6 +97,31 @@ namespace Fasetto.Word
 
             //Fix window resize issue
             var resizer = new WindowResizer(_window);
+
+            // Listen out for dock changes
+            resizer.WindowDockChanged += (dock) =>
+            {
+                // Store last position
+                _dockPosition = dock;
+
+                // Fire off resize events
+                WindowResized();
+            };
+        }
+
+        /// <summary>
+        /// If the window resizes to a special position (docked or maximized)
+        /// this will update all required property change events to set the borders and radius values
+        /// </summary>
+        private void WindowResized()
+        {
+            // Fire off events for all properties that are affected by a resize
+            OnPropertyChanged(nameof(Borderless));
+            OnPropertyChanged(nameof(ResizeBorderThickness));
+            OnPropertyChanged(nameof(OuterMarginSize));
+            OnPropertyChanged(nameof(OuterMarginSizeThickness));
+            OnPropertyChanged(nameof(WindowRadius));
+            OnPropertyChanged(nameof(WindowCornerRadius));
         }
     }
 }
